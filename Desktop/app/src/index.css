@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Hebrew:wght@300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent horizontal scroll without breaking sticky positioning */
+html {
+  overflow-x: hidden;
+}
+
+@layer base {
+  :root {
+    /* Industrial Sophistication Palette */
+    --background: 220 15% 8%;
+    --foreground: 210 20% 96%;
+    --card: 220 15% 10%;
+    --card-foreground: 210 20% 96%;
+    --popover: 220 15% 10%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 195 100% 50%;
+    --primary-foreground: 220 15% 8%;
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 210 20% 96%;
+    --muted: 220 10% 18%;
+    --muted-foreground: 210 10% 60%;
+    --accent: 195 100% 50%;
+    --accent-foreground: 220 15% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 96%;
+    --border: 220 10% 20%;
+    --input: 220 10% 18%;
+    --ring: 195 100% 50%;
+    --radius: 0.5rem;
+    
+    /* Custom Blueprint Colors */
+    --blueprint: 195 100% 50%;
+    --blueprint-dim: 195 80% 35%;
+    --concrete: 220 10% 25%;
+    --concrete-dark: 220 15% 12%;
+    --concrete-light: 220 10% 35%;
+    --highlight: 45 100% 55%;
+    
+    /* Sidebar */
+    --sidebar-background: 220 15% 8%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 195 100% 50%;
+    --sidebar-primary-foreground: 220 15% 8%;
+    --sidebar-accent: 220 10% 15%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 220 10% 20%;
+    --sidebar-ring: 195 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', 'Noto Sans Hebrew', 'Noto Sans Arabic', system-ui, sans-serif;
+  }
+  
+  /* RTL Support */
+  [dir="rtl"] {
+    font-family: 'Noto Sans Hebrew', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+  }
+  
+  /* Custom Selection */
+  ::selection {
+    background: hsl(var(--blueprint) / 0.3);
+    color: hsl(var(--foreground));
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--concrete-dark));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--concrete));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--blueprint-dim));
+  }
+}
+
+@layer components {
+  /* Glassmorphism */
+  .glass {
+    @apply backdrop-blur-md bg-background/70 border border-border/50;
+  }
+  
+  .glass-strong {
+    @apply backdrop-blur-xl bg-background/85 border border-border/70;
+  }
+  
+  /* Blueprint Grid Background */
+  .blueprint-grid {
+    background-image: 
+      linear-gradient(hsl(var(--blueprint) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--blueprint) / 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+  
+  /* Hairline Border */
+  .hairline {
+    @apply border-[0.5px] border-border/60;
+  }
+  
+  /* Glow Effects */
+  .glow-blueprint {
+    box-shadow: 0 0 20px hsl(var(--blueprint) / 0.3),
+                0 0 40px hsl(var(--blueprint) / 0.1);
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 20px hsl(var(--blueprint) / 0.5);
+  }
+  
+  /* CAD-style Lines */
+  .cad-line {
+    @apply h-px bg-gradient-to-r from-transparent via-border to-transparent;
+  }
+  
+  /* Section Spacing */
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-24;
+  }
+  
+  /* Focus Styles for Accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+@layer utilities {
+  /* Animation Utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .animate-scan {
+    animation: scan 3s linear infinite;
+  }
+  
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  
+  /* Text Gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Perspective for 3D effects */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}
+
+/* Custom Cursor Styles */
+.custom-cursor {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
