@@ -19,15 +19,6 @@ function App() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    // Set page metadata
-    document.title = 'GeoPrecision | Surveying & Architecture - Tel Aviv';
-    
-    // Add meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Tel Aviv\'s premier surveying and architectural firm, delivering millimeter-accurate geospatial data and visionary design solutions for complex urban developments.');
-    }
-
     return () => {
       document.head.removeChild(link);
     };

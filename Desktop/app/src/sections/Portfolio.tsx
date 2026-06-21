@@ -105,11 +105,16 @@ export default function Portfolio() {
 
                   {/* Content Overlay */}
                   <div className={`absolute inset-0 p-5 flex flex-col justify-end ${isRTL ? 'text-right' : ''}`}>
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="px-3 py-1 text-xs font-medium bg-cyan-500/20 backdrop-blur-sm text-cyan-400 rounded-full border border-cyan-500/30">
-                        {t.filters[project.category as ProjectCategory]}
-                      </span>
+                    {/* Category Badge + Illustration Badge */}
+                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <div className="flex gap-1.5 items-center">
+                        <span className="px-3 py-1 text-xs font-medium bg-cyan-500/20 backdrop-blur-sm text-cyan-400 rounded-full border border-cyan-500/30">
+                          {t.filters[project.category as ProjectCategory]}
+                        </span>
+                        <span className="px-1.5 py-1 text-[9px] font-medium bg-cyan-500/10 backdrop-blur-sm text-white/40 rounded-full border border-white/5">
+                          {language === 'en' ? 'Illustration' : language === 'he' ? 'תמונת המחשה' : 'صورة توضيحية'}
+                        </span>
+                      </div>
                       <ExternalLink className="w-5 h-5 text-white/70" />
                     </div>
 

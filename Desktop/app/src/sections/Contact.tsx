@@ -169,23 +169,21 @@ export default function Contact() {
                 ))}
               </div>
 
-              {/* Map placeholder */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden border border-border/50 bg-secondary/30">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">
-                      {language === 'en' ? 'Tel Aviv, Israel' : 
-                       language === 'he' ? 'תל אביב, ישראל' : 
-                       'تل أبيب، إسرائيل'}
-                    </p>
-                  </div>
-                </div>
-                {/* Grid overlay */}
-                <div className="absolute inset-0 opacity-20" style={{
-                  backgroundImage: 'linear-gradient(rgba(0, 212, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 212, 255, 0.3) 1px, transparent 1px)',
-                  backgroundSize: '20px 20px',
-                }} />
+              {/* Map embed */}
+              <div className="relative aspect-video rounded-2xl overflow-hidden border border-border/50 group">
+                <iframe
+                  src="https://maps.google.com/maps?q=32.0853,34.7818&z=15&output=embed"
+                  width="100%"
+                  height="100%"
+                  style={{ 
+                    filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)',
+                    border: 0 
+                  }}
+                  allowFullScreen={true}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="GeoPrecision Location Map"
+                />
               </div>
             </motion.div>
 

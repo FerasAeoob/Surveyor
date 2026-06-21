@@ -271,7 +271,7 @@ export const translations: Record<Language, Translation> = {
       },
       info: {
         address: '123 HaMasger Street, Tel Aviv-Yafo, 6721108',
-        phone: '+972 3-529-8888',
+        phone: '03-123-4567',
         email: 'projects@geoprecision.co.il',
         hours: 'Sun-Thu: 08:00-18:00 | Fri: 08:00-12:00',
       },
@@ -457,7 +457,7 @@ export const translations: Record<Language, Translation> = {
       },
       info: {
         address: 'המסגר 123, תל אביב-יפו, 6721108',
-        phone: '03-529-8888',
+        phone: '03-123-4567',
         email: 'projects@geoprecision.co.il',
         hours: 'א\'-ה\': 08:00-18:00 | ו\': 08:00-12:00',
       },
@@ -643,7 +643,7 @@ export const translations: Record<Language, Translation> = {
       },
       info: {
         address: '123 شارع هاماسجير، تل أبيب-يافا، 6721108',
-        phone: '+972 3-529-8888',
+        phone: '03-123-4567',
         email: 'projects@geoprecision.co.il',
         hours: 'الأحد-الخميس: 08:00-18:00 | الجمعة: 08:00-12:00',
       },
@@ -657,14 +657,14 @@ export const translations: Record<Language, Translation> = {
 
 // Portfolio project images mapping
 export const projectImages: Record<string, string> = {
-  '1': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
-  '2': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80',
-  '3': 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=80',
-  '4': 'https://images.unsplash.com/photo-1565514020176-db98e3c15463?w=800&q=80',
-  '5': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-  '6': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-  '7': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
-  '8': 'https://images.unsplash.com/photo-1548625361-188864d437b5?w=800&q=80',
+  '1': '/Surveyor/images/projects/azrieli-expansion.webp',
+  '2': '/Surveyor/images/projects/airport-terminal-construction.webp',
+  '3': '/Surveyor/images/projects/jaffa-port-development.webp',
+  '4': '/Surveyor/images/projects/intel-kiryat-gat.webp',
+  '5': '/Surveyor/images/projects/light-rail-construction.webp',
+  '6': '/Surveyor/images/projects/sarona-towers.webp',
+  '7': '/Surveyor/images/projects/haifa-industrial-zone.webp',
+  '8': '/Surveyor/images/projects/jerusalem-heritage-survey.webp',
 };
 
 // Service icons mapping
@@ -689,9 +689,9 @@ export const companyInfo = {
     country: 'Israel',
   },
   contact: {
-    phone: '+972 3-529-8888',
+    phone: '03-123-4567',
     email: 'projects@geoprecision.co.il',
-    fax: '+972 3-529-8889',
+    fax: '03-123-4568',
   },
   social: {
     linkedin: 'https://linkedin.com/company/geoprecision',
