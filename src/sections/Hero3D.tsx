@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
@@ -262,22 +262,39 @@ function StoryOverlay({
 export default function Hero3D() {
   const { language, isRTL } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const bottomFadeRef = useRef<HTMLDivElement>(null);
+  const progressBarWrapperRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLSpanElement>(null);
+
   const [loadProgress, setLoadProgress] = useState(0);
   const [imagesReady, setImagesReady] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [currentFrame, setCurrentFrame] = useState(0);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(-1);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef(0);
+  const targetFrameRef = useRef(0);
+  const lastActiveSlideIndexRef = useRef(-1);
+  const lastShowScrollIndicatorRef = useRef(true);
 
   // ── Preload all frames ──
   useEffect(() => {
     let loaded = 0;
     let failed = 0;
-    framePaths.forEach((src) => {
+    const loadedImages: HTMLImageElement[] = [];
+
+    framePaths.forEach((src, idx) => {
       const img = new Image();
       img.src = src;
       const handleLoad = () => {
         loaded++;
+        loadedImages[idx] = img;
         setLoadProgress((loaded + failed) / TOTAL_FRAMES);
         if (loaded + failed === TOTAL_FRAMES) {
+          imagesRef.current = loadedImages;
           setTimeout(() => setImagesReady(true), 300);
         }
       };
@@ -286,6 +303,7 @@ export default function Hero3D() {
         console.error(`Failed to load frame: ${src}`);
         setLoadProgress((loaded + failed) / TOTAL_FRAMES);
         if (loaded + failed === TOTAL_FRAMES) {
+          imagesRef.current = loadedImages;
           setTimeout(() => setImagesReady(true), 300);
         }
       };
@@ -293,6 +311,89 @@ export default function Hero3D() {
       img.onerror = handleError;
     });
   }, []);
+
+  const drawFrame = useCallback((frameIndex: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = imagesRef.current[frameIndex];
+    if (!img) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const iw = img.width;
+    const ih = img.height;
+    const r = Math.max(w / iw, h / ih);
+    const nw = iw * r;
+    const nh = ih * r;
+    const cx = (w - nw) / 2;
+    const cy = (h - nh) / 2;
+
+    ctx.drawImage(img, 0, 0, iw, ih, cx, cy, nw, nh);
+  }, []);
+
+  const resizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    const width = parent.clientWidth;
+    const height = parent.clientHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    if (imagesReady) {
+      drawFrame(Math.round(currentFrameRef.current));
+    }
+  }, [imagesReady, drawFrame]);
+
+  // Resize listener
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+    return () => window.removeEventListener('resize', resizeCanvas);
+  }, [resizeCanvas]);
+
+  // ── Render loop (interpolated frame updates) ──
+  useEffect(() => {
+    if (!imagesReady) return;
+
+    let animId: number;
+    let lastDrawnFrame = -1;
+
+    const renderLoop = () => {
+      const diff = targetFrameRef.current - currentFrameRef.current;
+      
+      if (Math.abs(diff) < 0.01) {
+        currentFrameRef.current = targetFrameRef.current;
+      } else {
+        currentFrameRef.current += diff * 0.15;
+      }
+
+      const frameToDraw = Math.round(currentFrameRef.current);
+      
+      if (frameToDraw !== lastDrawnFrame) {
+        drawFrame(frameToDraw);
+        lastDrawnFrame = frameToDraw;
+        
+        if (counterRef.current) {
+          counterRef.current.textContent = `${String(frameToDraw + 1).padStart(3, '0')}/${TOTAL_FRAMES}`;
+        }
+      }
+
+      animId = requestAnimationFrame(renderLoop);
+    };
+
+    animId = requestAnimationFrame(renderLoop);
+    return () => cancelAnimationFrame(animId);
+  }, [imagesReady, drawFrame]);
 
   // ── Scroll listener ──
   useEffect(() => {
@@ -302,10 +403,60 @@ export default function Hero3D() {
       const rect = el.getBoundingClientRect();
       const scrollable = el.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
+
       const p = Math.max(0, Math.min(1, -rect.top / scrollable));
-      setScrollProgress(p);
-      setCurrentFrame(Math.min(Math.floor(p * (TOTAL_FRAMES - 1)), TOTAL_FRAMES - 1));
+      
+      // Update target frame for interpolation loop
+      targetFrameRef.current = p * (TOTAL_FRAMES - 1);
+
+      // 1. Show/hide progress bar wrapper directly in DOM
+      if (progressBarWrapperRef.current) {
+        if (p > 0.01 && p < 0.99) {
+          progressBarWrapperRef.current.style.opacity = '1';
+        } else {
+          progressBarWrapperRef.current.style.opacity = '0';
+        }
+      }
+
+      // 2. Update progress bar width directly in DOM
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${p * 100}%`;
+      }
+
+      // 3. Update sticky viewport opacity directly in DOM
+      if (viewportRef.current) {
+        if (p > 0.88) {
+          viewportRef.current.style.opacity = String(1 - ((p - 0.88) / 0.12) * 0.6);
+        } else {
+          viewportRef.current.style.opacity = '1';
+        }
+      }
+
+      // 4. Update bottom fade opacity directly in DOM
+      if (bottomFadeRef.current) {
+        if (p > 0.75) {
+          bottomFadeRef.current.style.opacity = String(Math.min(1, (p - 0.75) / 0.2));
+        } else {
+          bottomFadeRef.current.style.opacity = '0';
+        }
+      }
+
+      // 5. Update React states only when boundaries are crossed
+      const nextIdx = STORY.findIndex(
+        (s) => p >= s.from && p <= s.to
+      );
+      if (nextIdx !== lastActiveSlideIndexRef.current) {
+        lastActiveSlideIndexRef.current = nextIdx;
+        setActiveSlideIndex(nextIdx);
+      }
+
+      const nextShow = p < 0.03;
+      if (nextShow !== lastShowScrollIndicatorRef.current) {
+        lastShowScrollIndicatorRef.current = nextShow;
+        setShowScrollIndicator(nextShow);
+      }
     };
+
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
@@ -315,11 +466,6 @@ export default function Hero3D() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Which story slide is active?
-  const activeSlideIndex = STORY.findIndex(
-    (s) => scrollProgress >= s.from && scrollProgress <= s.to
-  );
-
   return (
     <>
       {/* ── Loader ── */}
@@ -327,15 +473,18 @@ export default function Hero3D() {
         {!imagesReady && <CalibrationLoader progress={loadProgress} />}
       </AnimatePresence>
 
-      {/* ── Progress bar ── */}
-      {imagesReady && scrollProgress > 0.01 && scrollProgress < 0.99 && (
-        <div className="fixed top-0 left-0 right-0 h-[2px] z-50 bg-white/5">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-500 to-cyan-300"
-            style={{ width: `${scrollProgress * 100}%`, transition: 'width 50ms linear' }}
-          />
-        </div>
-      )}
+      {/* ── Progress bar (controlled directly via ref for maximum performance) ── */}
+      <div 
+        ref={progressBarWrapperRef}
+        className="fixed top-0 left-0 right-0 h-[2px] z-50 bg-white/5 transition-opacity duration-300 pointer-events-none"
+        style={{ opacity: 0 }}
+      >
+        <div
+          ref={progressBarRef}
+          className="h-full bg-gradient-to-r from-cyan-500 to-cyan-300"
+          style={{ width: '0%', transition: 'width 50ms linear' }}
+        />
+      </div>
 
       <section
         ref={sectionRef}
@@ -345,23 +494,21 @@ export default function Hero3D() {
       >
         {/* ── Sticky viewport ── */}
         <div
+          ref={viewportRef}
           className="sticky top-0 h-screen w-full overflow-hidden bg-[#0a0a0a]"
           style={{
-            opacity: scrollProgress > 0.88 ? 1 - ((scrollProgress - 0.88) / 0.12) * 0.6 : 1,
             transition: 'opacity 0.15s ease-out',
           }}
         >
-
-          {/* ── Frame image (simple img swap — no canvas bugs) ── */}
-          {imagesReady && (
-            <img
-              src={framePaths[currentFrame]}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ willChange: 'auto' }}
-              draggable={false}
-            />
-          )}
+          {/* ── Frame canvas (drawn from memory cache — ultra high performance) ── */}
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full block"
+            style={{
+              opacity: imagesReady ? 1 : 0,
+              transition: 'opacity 0.5s ease-in-out',
+            }}
+          />
 
           {/* ── Grading overlays ── */}
           <div className="absolute inset-0 z-[1] pointer-events-none" style={{
@@ -388,15 +535,18 @@ export default function Hero3D() {
           ))}
 
           {/* ── Frame counter ── */}
-          <div className="absolute bottom-4 right-4 z-30 pointer-events-none select-none">
-            <span className="text-[10px] font-mono text-white/15 tabular-nums tracking-wider">
-              {String(currentFrame + 1).padStart(3, '0')}/{TOTAL_FRAMES}
+          <div className="absolute bottom-4 left-4 sm:left-6 lg:left-8 z-30 pointer-events-none select-none">
+            <span 
+              ref={counterRef}
+              className="text-[10px] font-mono text-white/15 tabular-nums tracking-wider"
+            >
+              001/{TOTAL_FRAMES}
             </span>
           </div>
 
           {/* ── Scroll indicator ── */}
           <AnimatePresence>
-            {scrollProgress < 0.03 && imagesReady && (
+            {showScrollIndicator && imagesReady && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -422,11 +572,12 @@ export default function Hero3D() {
 
           {/* ── Bottom fade into next section ── */}
           <div
+            ref={bottomFadeRef}
             className="absolute bottom-0 left-0 right-0 z-[2] pointer-events-none"
             style={{
               height: '40%',
               background: 'linear-gradient(to bottom, transparent 0%, hsl(220 15% 8%) 100%)',
-              opacity: scrollProgress > 0.75 ? Math.min(1, (scrollProgress - 0.75) / 0.2) : 0,
+              opacity: 0,
               transition: 'opacity 0.2s ease-out',
             }}
           />

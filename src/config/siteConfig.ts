@@ -272,7 +272,7 @@ export const translations: Record<Language, Translation> = {
       info: {
         address: '123 HaMasger Street, Tel Aviv-Yafo, 6721108',
         phone: '03-123-4567',
-        email: 'projects@geoprecision.co.il',
+        email: 'info@example.com',
         hours: 'Sun-Thu: 08:00-18:00 | Fri: 08:00-12:00',
       },
     },
@@ -458,7 +458,7 @@ export const translations: Record<Language, Translation> = {
       info: {
         address: 'המסגר 123, תל אביב-יפו, 6721108',
         phone: '03-123-4567',
-        email: 'projects@geoprecision.co.il',
+        email: 'info@example.com',
         hours: 'א\'-ה\': 08:00-18:00 | ו\': 08:00-12:00',
       },
     },
@@ -644,7 +644,7 @@ export const translations: Record<Language, Translation> = {
       info: {
         address: '123 شارع هاماسجير، تل أبيب-يافا، 6721108',
         phone: '03-123-4567',
-        email: 'projects@geoprecision.co.il',
+        email: 'info@example.com',
         hours: 'الأحد-الخميس: 08:00-18:00 | الجمعة: 08:00-12:00',
       },
     },
@@ -690,12 +690,12 @@ export const companyInfo = {
   },
   contact: {
     phone: '03-123-4567',
-    email: 'projects@geoprecision.co.il',
+    email: 'info@example.com',
     fax: '03-123-4568',
   },
   social: {
-    linkedin: 'https://linkedin.com/company/geoprecision',
-    instagram: 'https://instagram.com/geoprecision',
+    linkedin: 'https://linkedin.com',
+    instagram: 'https://instagram.com',
   },
   certifications: [
     'ISO 9001:2015',
